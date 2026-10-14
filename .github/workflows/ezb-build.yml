@@ -18,7 +18,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
       - name: JVM 映射测试
         run: ./gradlew :test:test --no-daemon
