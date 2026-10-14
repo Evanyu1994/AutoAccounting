@@ -1,0 +1,61 @@
+name: ezb-build
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/ezbookkeeping]
+permissions:
+  contents: read
+concurrency:
+  group: ezb-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - name: JVM 映射测试
+        run: ./gradlew :test:test --no-daemon
+      - name: Release 编译
+        run: ./gradlew :app:assembleRelease --no-daemon
+      - name: 签名 APK（需要独立签名 Secrets）
+        env:
+          EZB_KEYSTORE_BASE64: ${{ secrets.EZB_KEYSTORE_BASE64 }}
+          EZB_KEYSTORE_PASSWORD: ${{ secrets.EZB_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          APK=$(find app/build/outputs/apk/release -name '*.apk' -print -quit)
+          if [ -z "$EZB_KEYSTORE_BASE64" ] || [ -z "$EZB_KEYSTORE_PASSWORD" ]; then
+            echo '::warning::缺少签名 Secrets，仅交付编译验证产物，不可作为正式安装包。'
+            cp "$APK" dist/AutoAccounting-ezb-4.0.2-CI-ONLY.apk
+            exit 0
+          fi
+          KEYSTORE="$RUNNER_TEMP/autoacc-ezb.keystore"
+          trap 'rm -f "$KEYSTORE"' EXIT
+          printf '%s' "$EZB_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+          TOOLS=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$TOOLS/zipalign" -f -p 4 "$APK" "$RUNNER_TEMP/aligned.apk"
+          "$TOOLS/apksigner" sign --ks "$KEYSTORE" --ks-key-alias autoacc-ezb --ks-pass env:EZB_KEYSTORE_PASSWORD --key-pass env:EZB_KEYSTORE_PASSWORD --out dist/AutoAccounting-ezb-4.0.2.apk "$RUNNER_TEMP/aligned.apk"
+          "$TOOLS/apksigner" verify --verbose dist/AutoAccounting-ezb-4.0.2.apk
+      - name: 上传测试证据
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ezb-test-results
+          path: |
+            test/build/test-results/test/
+            test/build/reports/tests/test/
+            test/build/ezb-e2e-request.json
+      - name: 上传 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ezb-apk
+          path: dist/*.apk
+          if-no-files-found: error

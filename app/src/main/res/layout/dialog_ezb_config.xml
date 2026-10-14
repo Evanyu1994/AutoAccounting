@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:fillViewport="true" android:saveEnabled="false">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="8dp" android:saveEnabled="false">
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="连接 ezBookkeeping" android:textAppearance="?attr/textAppearanceTitleLarge" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp"
+            android:hint="服务器地址">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/serverUrl"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:inputType="textUri" android:singleLine="true" android:saveEnabled="false" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:hint="API 令牌" app:endIconMode="password_toggle" app:endIconContentDescription="显示或隐藏 API 令牌">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/apiToken"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:inputType="textPassword" android:singleLine="true" android:saveEnabled="false"
+                android:importantForAutofill="no" android:imeOptions="flagNoPersonalizedLearning" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.button.MaterialButton android:id="@+id/testConnection"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:text="测试连接" />
+        <com.google.android.material.textview.MaterialTextView android:id="@+id/status"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:accessibilityLiveRegion="polite" android:text="先测试连接，再选择默认账户和分类。" />
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="默认账户">
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/defaultAccount"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="默认分类（二级）">
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/defaultCategory"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="默认分类只用于同类型账单。转账必须匹配两个账户和转账分类；其他类型匹配不到时保留未同步。" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/saveConfig"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:text="保存" />
+    </LinearLayout>
+</ScrollView>

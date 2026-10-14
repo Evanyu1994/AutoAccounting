@@ -31,6 +31,9 @@ class IntroPageAppFragment : BaseIntroPageFragment<FragmentIntroPageAppBinding>(
             PrefManager.bookApp = apps[binding.ledgerCardGroup.selectedIndex].pkg
             //选择功能
             vm.pageRequest.value = IntroPagerAdapter.IntroPage.FEATURE
+            if (apps[binding.ledgerCardGroup.selectedIndex] is net.ankio.auto.adapter.EzBookkeepingAdapter) {
+                net.ankio.auto.ui.api.BaseSheetDialog.create<net.ankio.auto.ui.dialog.EzbConfigDialog>(requireContext()).show()
+            }
 
         }
         binding.btnBack.setOnClickListener {
@@ -61,7 +64,7 @@ class IntroPageAppFragment : BaseIntroPageFragment<FragmentIntroPageAppBinding>(
                 setDescription(app.desc)
                 setOnCardClickListener {
                     //判断App是否安装
-                    if (!context.isAppInstalled(app.pkg) && app.link.isNotEmpty()) {
+                    if (!context.isAppInstalled(app.pkg) && app.link.isNotEmpty() && app !is net.ankio.auto.adapter.EzBookkeepingAdapter) {
                         CustomTabsHelper.launchUrl(app.link.toUri())
                     }
                 }

@@ -214,6 +214,8 @@ object BillTool {
      */
     fun prepareBillForSync(bill: BillInfoModel): BillInfoModel {
         val syncBill = bill.copy()
+        // HTTP adapter needs the original transfer/accounts and records fee in the comment.
+        if (AppAdapterManager.adapter() is net.ankio.auto.adapter.EzBookkeepingAdapter) return syncBill
         if (!PrefManager.featureFee) {
             syncBill.fee = 0.0
         }

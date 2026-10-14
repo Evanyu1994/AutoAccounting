@@ -82,6 +82,9 @@ class AppDialog internal constructor(
             PrefManager.bookApp = selected.pkg
             // 关闭弹窗
             dismiss()
+            if (selected is net.ankio.auto.adapter.EzBookkeepingAdapter) {
+                BaseSheetDialog.create<EzbConfigDialog>(ctx).show()
+            }
         }
         recyclerView.adapter = adapter
         // 使用全量提交，避免依赖 Diff 回调

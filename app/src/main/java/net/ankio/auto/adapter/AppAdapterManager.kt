@@ -51,6 +51,7 @@ object AppAdapterManager {
             YiYuAdapter(), // 一羽记账
             YiMuAdapter(), // 一木记账
             XiaoXinAdapter(), // 小星记账
+            EzBookkeepingAdapter(), // ezBookkeeping HTTP 直连
         )
     }
 

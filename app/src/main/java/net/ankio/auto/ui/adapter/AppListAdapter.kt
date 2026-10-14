@@ -37,7 +37,7 @@ class AppListAdapter(
         binding.root.setOnClickListener {
             val app = holder.item ?: return@setOnClickListener
             val installedApp = context.isAppInstalled(app.pkg)
-            if (!installedApp && app.link.isNotEmpty()) {
+            if (!installedApp && app.link.isNotEmpty() && app !is net.ankio.auto.adapter.EzBookkeepingAdapter) {
                 CustomTabsHelper.launchUrlOrCopy(app.link)
             } else {
                 binding.checkbox.isChecked = true

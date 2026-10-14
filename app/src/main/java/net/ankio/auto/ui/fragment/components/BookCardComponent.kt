@@ -56,6 +56,10 @@ class BookCardComponent(binding: CardBookBinding) :
     override fun onComponentCreate() {
         super.onComponentCreate()
         binding.app.setOnClickListener {
+            if (AppAdapterManager.adapter() is net.ankio.auto.adapter.EzBookkeepingAdapter) {
+                BaseSheetDialog.create<net.ankio.auto.ui.dialog.EzbConfigDialog>(context).show()
+                return@setOnClickListener
+            }
             BaseSheetDialog.create<AppDialog>(context)
                 .setOnClose {
                     onComponentResume()
