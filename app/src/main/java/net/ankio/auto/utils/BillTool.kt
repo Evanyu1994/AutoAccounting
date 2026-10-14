@@ -184,8 +184,17 @@ object BillTool {
                 try {
                     val adapter = AppAdapterManager.adapter()
                     // 不走 syncBill，避免与 adapter.sleep() 叠加延迟
-                    adapter.syncBill(prepareBillForSync(bill))
-                    if (adapter is QianJiAdapter && WorkMode.isXposedOrLSPatch()) {
+                    if (adapter is net.ankio.auto.adapter.EzBookkeepingAdapter) {
+                        // HTTP 适配器会等待网络返回，不能在主线程执行
+                        kotlinx.coroutines.withContext(Dispatchers.IO) {
+                            adapter.syncBill(prepareBillForSync(bill))
+                        }
+                    } else {
+                        adapter.syncBill(prepareBillForSync(bill))
+                    }
+                    if (adapter is net.ankio.auto.adapter.EzBookkeepingAdapter) {
+                        // 已同步等待返回，无需额外间隔
+                    } else if (adapter is QianJiAdapter && WorkMode.isXposedOrLSPatch()) {
                         waitSynced(bill.id)
                     } else {
                         delay(3000L.milliseconds)
