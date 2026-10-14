@@ -21,6 +21,19 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: JVM 映射测试
         run: ./gradlew :test:test --no-daemon
+      - name: 核验 JVM 测试实际执行数量
+        run: |
+          python3 - <<'PY'
+          import glob, xml.etree.ElementTree as ET
+          reports = glob.glob('test/build/test-results/test/TEST-*EzbMappingTest.xml')
+          assert reports, 'Missing mapping test report'
+          roots = [ET.parse(path).getroot() for path in reports]
+          count = sum(int(root.attrib['tests']) for root in roots)
+          failures = sum(int(root.attrib['failures']) + int(root.attrib['errors']) for root in roots)
+          skipped = sum(int(root.attrib.get('skipped', 0)) for root in roots)
+          assert count >= 13 and failures == 0 and skipped == 0, (count, failures, skipped)
+          print(f'映射测试：{count} 项，失败 {failures} 项，跳过 {skipped} 项')
+          PY
       - name: Release 编译
         run: ./gradlew :app:assembleRelease --no-daemon
       - name: 签名 APK（需要独立签名 Secrets）
