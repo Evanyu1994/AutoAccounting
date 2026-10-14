@@ -67,9 +67,9 @@ class EzBookkeepingAdapter : IAppAdapter {
                             }
                         })
                         val categories = mutableListOf<CategoryModel>()
-                        data.categories.distinctBy { it.parentId }.forEach { c ->
+                        data.parents.forEach { c ->
                             categories.add(CategoryModel().apply {
-                                name = c.parentName; remoteId = c.parentId; remoteParentId = "-1"
+                                name = c.name; remoteId = c.id; remoteParentId = "-1"
                                 remoteBookId = "ezb"; type = localType(c.type)
                             })
                         }
@@ -85,6 +85,7 @@ class EzBookkeepingAdapter : IAppAdapter {
                         // Existing put APIs swallow errors; verify persistence before showing success.
                         if (AssetsAPI.list().map { it.name }.sorted() != data.accounts.map { it.name }.sorted() ||
                             BookNameAPI.list().none { it.remoteId == "ezb" }) throw EzbFailure("本地资产保存失败，请稍后再同步")
+                        if (TagAPI.all().map { it.name }.sorted() != data.tags.map { it.name }.sorted()) throw EzbFailure("本地标签保存失败")
                         for (type in listOf(BillType.Income, BillType.Expend, BillType.Transfer)) {
                             val parents = CategoryAPI.list("ezb", type, "-1")
                             val expected = categories.filter { it.type == type && it.remoteParentId == "-1" }

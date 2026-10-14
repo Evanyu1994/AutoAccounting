@@ -9,7 +9,9 @@ object EzbMapping {
     data class Category(val id: String, val name: String, val parentId: String,
                         val parentName: String, val type: Int)
     data class Tag(val id: String, val name: String)
-    data class Catalog(val accounts: List<Account>, val categories: List<Category>, val tags: List<Tag>)
+    data class Parent(val id: String, val name: String, val type: Int)
+    data class Catalog(val accounts: List<Account>, val categories: List<Category>, val tags: List<Tag>,
+                       val parents: List<Parent> = emptyList())
     data class Bill(val id: Long, val type: BillType, val money: Double, val time: Long,
                     val parent: String, val child: String, val from: String, val to: String,
                     val shop: String = "", val item: String = "", val remark: String = "",

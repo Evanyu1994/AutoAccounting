@@ -61,10 +61,12 @@ class EzbClient(private val config: EzbConfig) {
             }
             readAccounts(call("accounts/list.json"))
             val categories = mutableListOf<EzbMapping.Category>()
+            val parents = mutableListOf<EzbMapping.Parent>()
             for ((_, group) in call("transaction/categories/list.json").asJsonObject.entrySet()) {
                 for (node in group.asJsonArray) {
                     val p = node.asJsonObject
                     if (p.get("hidden")?.asBoolean == true) continue
+                    parents.add(EzbMapping.Parent(p.get("id").asString, p.get("name").asString, p.get("type").asInt))
                     val children = p.getAsJsonArray("subCategories") ?: continue
                     for (child in children) {
                         val c = child.asJsonObject
@@ -78,7 +80,7 @@ class EzbClient(private val config: EzbConfig) {
                 val t = it.asJsonObject
                 if (t.get("hidden")?.asBoolean == true) null else EzbMapping.Tag(t.get("id").asString, t.get("name").asString)
             }
-            return EzbMapping.Catalog(accounts, categories, tags)
+            return EzbMapping.Catalog(accounts, categories, tags, parents)
         } catch (e: EzbFailure) { throw e }
         catch (_: Exception) { throw EzbFailure("账户或分类响应格式不正确") }
     }

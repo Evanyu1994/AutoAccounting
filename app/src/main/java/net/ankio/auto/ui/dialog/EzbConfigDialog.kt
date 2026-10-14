@@ -70,7 +70,7 @@ class EzbConfigDialog(context: Context) : BaseSheetDialog<DialogEzbConfigBinding
                 binding.defaultCategory.setText(category?.let { categoryLabels[data.categories.indexOf(it)] } ?: "", false)
                 binding.defaultAccount.setOnItemClickListener { _, _, position, _ -> accountId = data.accounts[position].id }
                 binding.defaultCategory.setOnItemClickListener { _, _, position, _ -> categoryId = data.categories[position].id }
-                val count = data.categories.size + data.categories.distinctBy { it.parentId }.size
+                val count = data.categories.size + data.parents.size
                 binding.status.text = "✓ 连接成功：账户 ${data.accounts.size} 个，分类 $count 个"
             } catch (e: EzbFailure) { if (uiReady()) binding.status.text = e.message }
             catch (_: Exception) { if (uiReady()) binding.status.text = "连接未完成，请重试" }
